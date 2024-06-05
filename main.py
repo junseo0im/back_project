@@ -9,9 +9,6 @@ import uvicorn
 app = FastAPI()
 
 
-
-
-
 # CORS 설정 추가
 origins = [
     "http://127.0.0.1:5500",
@@ -39,12 +36,19 @@ class GuestbookEntryCreate(BaseModel):
 
 guestbook_entries = []
 
+
+@app.get("/")
+async def welcome() -> dict:
+    return {
+        "msg" : "hello world"
+    }
+
 @app.get("/guestbook", response_model=List[GuestbookEntry])
-def read_guestbook():
+async def read_guestbook():
     return guestbook_entries
 
 @app.post("/guestbook", response_model=GuestbookEntry)
-def create_entry(entry: GuestbookEntryCreate):
+async def create_entry(entry: GuestbookEntryCreate):
     new_entry = GuestbookEntry(
         id=len(guestbook_entries) + 1,  
         writer=entry.writer,
@@ -55,7 +59,7 @@ def create_entry(entry: GuestbookEntryCreate):
     return new_entry
 
 @app.delete("/guestbook/{entry_id}")
-def delete_entry(entry_id: int):
+async def delete_entry(entry_id: int):
     for entry in guestbook_entries:
         if entry.id == entry_id:
             guestbook_entries.remove(entry)
