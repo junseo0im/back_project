@@ -34,7 +34,7 @@ guestbook_entries = []
 
 
 @app.get("/")
-async def welcome():
+async def welcome() -> dict:
     return {
         "msg" : "hello world"
     }
