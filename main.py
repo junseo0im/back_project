@@ -10,11 +10,7 @@ app = FastAPI()
 
 
 # CORS 설정 추가
-origins = [
-    "http://127.0.0.1:5500",
-    "18.210.66.19",
-    
-]
+origins = ["http://127.0.0.1:5500", "18.210.66.19"]
 
 app.add_middleware(
     CORSMiddleware,
@@ -67,4 +63,4 @@ async def delete_entry(entry_id: int):
     return {"message": "Entry not found"}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=80, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True) 
