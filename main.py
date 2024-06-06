@@ -1,13 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-
 import uvicorn
 
 app = FastAPI()
-
 
 # CORS 설정 추가
 origins = ["http://127.0.0.1:5500", "http://18.210.66.19"]
@@ -19,6 +17,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+router = APIRouter()
 
 class GuestbookEntry(BaseModel):
     id: int
@@ -32,18 +33,15 @@ class GuestbookEntryCreate(BaseModel):
 
 guestbook_entries = []
 
-
-@app.get("/")
+@router.get("/")
 async def welcome() -> dict:
-    return {
-        "msg" : "hello world"
-    }
+    return {"msg": "hello world"}
 
-@app.get("/guestbook", response_model=List[GuestbookEntry])
+@router.get("/guestbook", response_model=List[GuestbookEntry])
 async def read_guestbook():
     return guestbook_entries
 
-@app.post("/guestbook", response_model=GuestbookEntry)
+@router.post("/guestbook", response_model=GuestbookEntry)
 async def create_entry(entry: GuestbookEntryCreate):
     new_entry = GuestbookEntry(
         id=len(guestbook_entries) + 1,  
@@ -54,7 +52,7 @@ async def create_entry(entry: GuestbookEntryCreate):
     guestbook_entries.append(new_entry)
     return new_entry
 
-@app.delete("/guestbook/{entry_id}")
+@router.delete("/guestbook/{entry_id}")
 async def delete_entry(entry_id: int):
     for entry in guestbook_entries:
         if entry.id == entry_id:
@@ -62,5 +60,8 @@ async def delete_entry(entry_id: int):
             return {"message": "Entry deleted successfully"}
     return {"message": "Entry not found"}
 
+
+app.include_router(router)
+
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=80, reload=True) 
+    uvicorn.run("main:app", host="0.0.0.0", port=8080, reload=True)
